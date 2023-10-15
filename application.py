@@ -5,9 +5,6 @@ import os
 import openai
 
 
-
-
-
 class Application:
 
 
@@ -20,17 +17,25 @@ class Application:
     def __init__(self):
 
        
-        # check environment variables
+        try:
+            with open('config.json') as json_file:
+                data = json.load(json_file)
+                self.api_key = data['openai_api_key']
+                self.access_key = data['aws_access_key']
+                self.secret_key = data['aws_secret_key']
+        except:
+            print("Provide data for authentication: (Your data will be saved in config.json file)\n")
+            self.api_key = input("OpenAI API key: ")
+            self.access_key = input("AWS access key: ")
+            self.secret_key = input("AWS secret key: ")
+            data = {}
+            data['openai_api_key'] = self.api_key
+            data['aws_access_key'] = self.access_key
+            data['aws_secret_key'] = self.secret_key
+            with open('config.json', 'w') as outfile:
+                json.dump(data, outfile)
 
-        if "OPENAI_API_KEY" not in os.environ:
-            openapi_key = input("OpenAI API key: ")
-            os.environ["OPENAI_API_KEY"] = openapi_key
-        if "AWS_ACCESS_KEY_ID" not in os.environ:
-            aws_access_key = input("AWS access key: ")
-            os.environ["AWS_ACCESS_KEY_ID"] = aws_access_key
-        if "AWS_SECRET_ACCESS_KEY" not in os.environ:
-            aws_secret_key = input("AWS secret key: ")
-            os.environ["AWS_SECRET_ACCESS_KEY"] = aws_secret_key       
+        openai.api_key = self.api_key
 
 
     
@@ -60,35 +65,20 @@ class Application:
             print("Bot: " + anwser)
 
 
-
-
-
-    def comp(PROMPT, MaxToken=4000, outputs=1): 
-        # using OpenAI's Completion module that helps execute  
-        # any tasks involving text  
+    def comp(PROMPT, MaxToken=3000, outputs=1): 
         response = openai.Completion.create( 
-            # model name used here is text-davinci-003 
-            # there are many other models available under the  
-            # umbrella of GPT-3 
             model="text-davinci-003", 
-            # passing the user input  
             prompt=PROMPT, 
-            # generated output can have "max_tokens" number of tokens  
             max_tokens=MaxToken, 
-            # number of outputs generated in one call 
             n=outputs,
-
             temperature=0.6
         ) 
-    
-        
-        return response.choices[0].text
 
+        return response.choices[0].text  
 
 
 if __name__ == "__main__":
     app = Application()
-    openai.api_key = os.environ["OPENAI_API_KEY"]
     app.run()
 
 
