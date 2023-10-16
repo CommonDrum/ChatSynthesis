@@ -1,29 +1,22 @@
-import json
-from chat import Chat
-from synthezator import synthezator
 import os
 import openai
+from Synthezator import *
+import json
 
-
-class Application:
-
-
-    prompt_adjustment = "Generate text for speech synthesis for the following text:\n "
-
-    def __init__(self):
-        self.synthezator = synthezator(self.access_key, self.secret_key)
-
-    def run(self, prompt):
-        
-        prompt = self.prompt_adjustment + prompt
-        anwser = Chat.comp(prompt)
-        self.synthezator.synthesize(anwser)
-        file = "output.mp3"
+def run(prompt):
+        synthezator = Synthezator()
+        #read promt adjustment from json file
+        with open('prompt_adjustment.json') as json_file:
+            data = json.load(json_file)
+            prompt_adjustment = data['prompt_adjustment']
+        prompt = prompt_adjustment + prompt
+        anwser = ask(prompt)
+        file = synthezator.synthesize(anwser)
         os.system("afplay " + file)
         print("Bot: " + anwser)
 
 
-    def comp(PROMPT, MaxToken=3000, outputs=1): 
+def ask(PROMPT, MaxToken=3000, outputs=1): 
         response = openai.Completion.create( 
             model="text-davinci-003", 
             prompt=PROMPT, 
@@ -35,8 +28,6 @@ class Application:
         return response.choices[0].text  
 
 
-if __name__ == "__main__":
-    app = Application()
-    app.run()
+
 
 
