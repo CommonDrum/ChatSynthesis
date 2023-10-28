@@ -16,7 +16,7 @@ def run(prompt):
         print("Bot: " + anwser)
 
 
-def ask(PROMPT, MaxToken=3000, outputs=1): 
+def ask(PROMPT, MaxToken=3900, outputs=1): 
         response = openai.Completion.create( 
             model="text-davinci-003", 
             prompt=PROMPT, 
